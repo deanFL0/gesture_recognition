@@ -57,16 +57,17 @@ while True:
                                         lm[2] - base_palm[2]] for lm in landmarks]
             if recording:
                 sequence.append(normalized_landmarks)
+                if len(sequence) == 30:
+                    save_data(sequence, label)
+                    sequence = []
+                    break
+                    
         
         cv2.imshow("Record Gesture", frame)
 
         key = cv2.waitKey(1) & 0xFF
         if key == ord('r'):
             recording = not recording
-            if not recording and sequence:
-                save_data(sequence, label)
-                sequence = []
-                break
         elif key == 27:
             cap.release()
             cv2.destroyAllWindows()
