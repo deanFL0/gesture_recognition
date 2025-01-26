@@ -1,11 +1,11 @@
+import os
 import cv2
 import mediapipe as mp
 import tensorflow as tf
-import os
 import numpy as np
 
 model = tf.keras.models.load_model("gesture_classifier.h5")
-gesture_labels = ["faster", "next", "previous"]
+gesture_labels = ["faster", "resume", "stop"]
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils   
@@ -15,7 +15,7 @@ hands = mp_hands.Hands(min_detection_confidence = 0.7, min_tracking_confidence =
 sequence = []
 sentence = []
 predictions = []
-THRESHOLD = 0.8
+THRESHOLD = 0.3
 
 cap = cv2.VideoCapture(0)
 
@@ -35,8 +35,12 @@ while cap.isOpened():
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS, mp_drawing_style.get_default_hand_landmarks_style(), mp_drawing_style.get_default_hand_connections_style())
 
             landmark = [[lm.x, lm.y,lm.z] for lm in hand_landmarks.landmark]
-            landmark = np.array(landmark).flatten()
-            sequence.append(landmark)
+            base_palm = landmark[0]
+            normalized_landmarks = [[lm[0] - base_palm[0],
+                                    lm[1] - base_palm[1],
+                                    lm[2] - base_palm[2]] for lm in landmark]
+            normalized_landmarks = np.array(normalized_landmarks).flatten()
+            sequence.append(normalized_landmarks)
             sequence = sequence[-30:]
             
             if len(sequence) == 30:
@@ -48,13 +52,15 @@ while cap.isOpened():
                     if res[np.argmax(res)] > THRESHOLD:
                         if len(sentence) > 0:
                             if gesture_labels[np.argmax(res)] != sentence[-1]:
-                                sentence.append(np.argmax(res))
+                                sentence.append(gesture_labels[np.argmax(res)])
+                        else:
+                            sentence.append(gesture_labels[np.argmax(res)])
                 
                 if len(sentence) > 5:
                     sentence = sentence[-5:]
 
-    cv2.rectangle(frame, (0,0), (640,40), (245,117,16),-1)
-    cv2.putText(frame, ' '.join(sentence), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1, cv2.LINE_AA)
+            cv2.rectangle(frame, (0,0), (640,40), (245,117,16),-1)
+            cv2.putText(frame, ' '.join(sentence), (3,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
     cv2.imshow("Gesture Control", frame)
 
