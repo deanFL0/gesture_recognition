@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 
 model = tf.keras.models.load_model("gesture_classifier.h5")
-gesture_labels = ["faster", "resume", "stop"]
+gesture_labels = ["faster", "like", "next", "previous", "resume", "stop"]
 
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils   
@@ -15,7 +15,7 @@ hands = mp_hands.Hands(min_detection_confidence = 0.7, min_tracking_confidence =
 sequence = []
 sentence = []
 predictions = []
-THRESHOLD = 0.3
+THRESHOLD = 0.8
 
 cap = cv2.VideoCapture(0)
 

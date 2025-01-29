@@ -10,7 +10,7 @@ def save_data(data, label):
     file_name = f"{save_dir}/{label}_{len(os.listdir(save_dir))}.csv"
     with open(file_name,mode='w',newline='') as file:
         writer = csv.writer(file)
-        header = [f"landmarks_{i}_x" for i in range(21)] + [f"landmarks_{i}_y" for i in range(21)] +[f"landmarks_{i}_z" for i in range(21)]
+        header = [f"{i}_{coord}" for i in range(21) for coord in ['x', 'y', 'z']]
         writer.writerow(header)
         for frame in data:
             row = [coord for landmark in frame for coord in landmark]
@@ -31,7 +31,7 @@ while True:
     mp_hands = mp.solutions.hands
     mp_drawing = mp.solutions.drawing_utils   
     mp_drawing_style = mp.solutions.drawing_styles
-    hands = mp_hands.Hands(min_detection_confidence = 0.7, min_tracking_confidence = 0.7)  
+    hands = mp_hands.Hands(min_detection_confidence = 0.7, min_tracking_confidence = 0.7, max_num_hands=1,)  
 
     cap = cv2.VideoCapture(0)
 
@@ -63,6 +63,7 @@ while True:
                     break
                     
         
+        cv2.putText(frame, "Click 'r' to start recording", (3,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
         cv2.imshow("Record Gesture", frame)
 
         key = cv2.waitKey(1) & 0xFF
