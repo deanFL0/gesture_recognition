@@ -113,8 +113,8 @@ while True:
             if key == ord('r'):
                 for i in range(wait_time, 0, -1):
                     ret, frame = cap.read()
-                    cv2.putText(frame, f"Starting in {i}", (200, 250), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3, cv2.LINE_AA)
+                    cv2.putText(frame, f"Starting in {i}", (100, 250), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3, cv2.LINE_AA)
                     cv2.imshow("Record Gesture", frame)
                     cv2.waitKey(1000)  
                 recording = not recording
